@@ -1,146 +1,78 @@
 import React from 'react'
 // import mapboxgl from 'components/utils/mapbox-gl.js';
 // import mapboxgl from 'mapbox-gl/dist/mapbox-gl.js';
+import controls from 'components/Controls'
 import './HomeView.scss'
 // import deepstream from 'deepstream.io-client-js'
 const deepstream = require('deepstream.io-client-js')
+const playerColors = ['#3D9101', '#F0F0E1', '#E89D0C', '#B51C04', '#451005']
 
-//global variables
+// global variables
 var map = null
 var client = deepstream('localhost:6020').login()
 
 class HomeView extends React.Component {
   constructor (props) {
     super(props)
-    this.state = { 
+    this.state = {
       currentPlayer: makeid(),
-      currentPosition: [ -73.8135831, 42.6762733]
+      currentPosition: [-73.8135831, 42.6762733],
+      game: 'game1',
+      players: []
     }
+    this.subscribeToGame = this.subscribeToGame.bind(this)
   }
 
-  connect () {
-    client.record.getRecord(`player/${this.state.currentPlayer}`).whenReady(record => {
-      record.set({
-        name: this.state.currentPlayer,
-        pos: this.state.currentPosition,
-        bearing: -9.47
-      })
-      // Interact with the record here
-      var marker
-      var delta = 100
-
-      function easeTo (t) {
-        if (marker && t === 1) marker.remove()
-        return t * (2 - t)
+  subscribeToGame () {
+    console.log('subscribeToGame1')
+    var currentPlayer = this.state.currentPlayer
+    client.record.getList(this.state.game).whenReady(gameList => {
+      var entries = gameList.getEntries()
+      console.log(entries)
+      if (!entries.includes(this.state.currentPlayer)) {
+        // add entry and remove on unload
+        console.log('add entry: ', currentPlayer)
+        gameList.addEntry(currentPlayer)
+        // this.addPlayer(name, playerColors[i % 6])\
+        window.addEventListener('beforeunload', (event) => {
+          gameList.removeEntry(currentPlayer)
+          console.log('remove entry: ', currentPlayer)
+          gameList.delete()
+        }, false)
       }
-
-      function move (pos, bearing) {
-        // console.log(pos, bearing)
-        if (bearing) {
-          map.easeTo({
-            bearing: pos,
-            easing: easeTo
-          })
-        } else {
-          map.panBy(pos, {
-            easing: easeTo
-          })
-        }
-        console.log([map.getCenter().lng, map.getCenter().lat])
-        record.set(
-          'pos', [map.getCenter().lng, map.getCenter().lat]
-        )
-      }
-
-      function goDirection (dir) {
-        switch (dir) {
-          case 'left':
-            move(map.getBearing() - 25, true)
-            break
-          case 'right':
-            move(map.getBearing() + 25, true)
-            break
-          case 'up':
-            move([0, -delta])
-            break
-          case 'down':
-            move([0, delta])
-            break
-        }
-      }
-
-      window.addEventListener('keydown', function (e) {
-        switch (e.which) {
-          case 38: // up
-            goDirection('up')
-            break
-          case 40: // down
-            goDirection('down')
-            break
-          case 37: // left
-            goDirection('left')
-            break
-          case 39: // right
-            goDirection('right')
-            break
-        }
+      gameList.subscribe(entries => {
+        console.log('subscribe', entries)
+        var playerList = entries.filter(d => d !== currentPlayer)
+        var players = this.state.players
+        playerList.forEach((player, i) => {
+          if (!players.includes(player)) {
+            console.log('add player', player)
+            this.addPlayer(player, playerColors[i % 6])
+            players.push(player)
+          }
+        })
+        this.setState({
+          players
+        })
       }, true)
-
-      var compass = document.querySelector('.js-compass')
-      map.on('rotate', function () {
-        var rotate = 'rotate(' + (map.transform.angle * (180 / Math.PI)) + 'deg)'
-        compass.style.transform = rotate
-      })
-
-      var buttonLeft = ['left', document.querySelector('.js-left')]
-      var buttonRight = ['right', document.querySelector('.js-right')]
-      var buttonTop = ['up', document.querySelector('.js-up')]
-      var buttonBottom = ['down', document.querySelector('.js-down')]
-
-      var buttons = [buttonLeft, buttonRight, buttonTop, buttonBottom]
-      var persist
-
-      function buttonStart (b) {
-        persist = setInterval(function () {
-          goDirection(b[0])
-        }, 20)
-      }
-
-      function buttonEnd () {
-        clearInterval(persist)
-      }
-
-      buttons.forEach(function (b) {
-        b[1].addEventListener('mousedown', buttonStart.bind(this, b))
-        b[1].addEventListener('touchstart', buttonStart.bind(this, b))
-        b[1].addEventListener('mouseup', buttonEnd.bind(this, b))
-        b[1].addEventListener('touchend', buttonEnd.bind(this, b))
-      })
-
-      function createMarker (e) {
-        var markerEl = document.createElement('div')
-        var dot = document.createElement('div')
-        dot.className = 'waypoint-dot'
-        var shadow = document.createElement('div')
-        shadow.className = 'waypoint-shadow'
-        markerEl.appendChild(dot)
-        markerEl.appendChild(shadow)
-        marker = new mapboxgl.Marker(markerEl).setLngLat(e.lngLat).addTo(map)
-
-        window.setTimeout(function () {
-          map.flyTo({
-            center: e.lngLat,
-            easing: easeTo
-          })
-        }, 500)
-      }
-
-      map.on('click', createMarker)
-      map.on('touchstart', createMarker)
     })
   }
 
   componentDidMount () {
+    // client.event.listen('status/.*', (match, isSubcribed, response) => {
+    //   console.log('somehting', match, isSubcribed, response)
+    //   var name = match.replace('status/', '')
+    //   this.addPlayer(name, playerColors[i % 6])
+    //   if (isSubcribed) {
+    //     response.accept()
+    //   }
+    //   i++
+    // })
+    console.log('did mount')
+    client.on('connectionStateChanged', function (connectionState) {
+      console.log('connectionState', connectionState)
+    })
+
     mapboxgl.accessToken = 'pk.eyJ1Ijoic2FtYW4iLCJhIjoiS1ptdnd0VSJ9.19qza-F_vXkgpnh80oZJww'
     map = new mapboxgl.Map({
       container: 'map',
@@ -148,7 +80,7 @@ class HomeView extends React.Component {
         position: 'top-left'
       },
       style: 'mapbox://styles/saman/ciql4uao1000xbkm7knq5qf52',
-      center: [ -73.8135831, 42.6762733],
+      center: [-73.8135831, 42.6762733],
       zoom: 24,
       bearing: -9.47,
       pitch: 90.00
@@ -161,9 +93,11 @@ class HomeView extends React.Component {
     map.touchZoomRotate.disable()
 
     map.on('load', () => {
-      this.connect()
-      this.addPlayer([-73.8135831, 42.6762733], 'player1')
-      //this.addPlayer([42.6762733, -73.8135831], 'player2')
+      controls(client, map, this.state.currentPlayer)
+      this.subscribeToGame()
+      // this.addPlayer([42.6762733, -73.8135831], 'player2', 'red')
+      // this.addPlayer([-73.8135831, 42.6762733], 'player1')
+      // this.addPlayer([42.6762733, -73.8135831], 'player2')
       map.addLayer({
         'id': '3d-buildings',
         'source': 'composite',
@@ -187,36 +121,46 @@ class HomeView extends React.Component {
     })
   }
 
-  addPlayer (location, id) {
-    var i = 0;
+  addPlayer (id, color) {
+    var record = client.record.getRecord(`player/${id}`)
+    record.subscribe('pos', value => {
+      this.movePlayer(value, id)
+    })
+    var data = record.get('pos')
+    console.log('adding player', id, data)
     map.addSource(id, {
       'type': 'geojson',
       'data': {
         'type': 'Point',
-        'coordinates': location
+        'coordinates': [-73.8135831, 42.6762733] // record.get('pos')
+      }
+    })
+
+    map.addLayer({
+      'id': id + '-glow',
+      'type': 'circle',
+      'source': id,
+      'paint': {
+        'circle-radius': 40,
+        'circle-color': color || '#fff',
+        'circle-opacity': 0.9
       }
     })
 
     map.addLayer({
       'id': id,
+      'type': 'symbol',
       'source': id,
-      'type': 'circle',
-      'paint': {
-        'circle-radius': 40,
-        'circle-color': '#007cbf'
+      'layout': {
+        'icon-image': 'airport-15'
       }
     })
-    window.setInterval(() => {
-      i++
-      // console.log('')
-      location[i % 2] += 0.00008
-      this.movePlayer(location, id)
-    }, 1000)
   }
 
   movePlayer (location, id) {
     // Update the data to a new position based on the animation timestamp. The
     // divisor in the expression `timestamp / 1000` controls the animation speed.
+    // console.log('move', location, id)
     map.getSource(id).setData({
       'type': 'Point',
       'coordinates': location
@@ -231,7 +175,19 @@ class HomeView extends React.Component {
       <div>
         <div className='pin-top pin-left map' id='map' />
         <div className='mb-attribution-container pad1x pad0y pin-bottomleft space-bottom1 space-left1 fill-darken1'>
-          <h4 style={{fontSize:24 }}>{this.state.currentPlayer}</h4>
+          <h4 style={{ fontSize:24 }}>{this.state.currentPlayer}</h4>
+        </div>
+        <div className='mb-attribution-container pad1x pad0y pin-topleft space-top2 space-left1 fill-darken1'>
+          <h4>Players:</h4>
+          <table className='table'>
+            <tbody>
+              {
+                this.state.players.map(d => {
+                  return (<tr key={d}><td>{d}</td></tr>)
+                })
+              }
+            </tbody>
+          </table>
         </div>
         <div className='pin-top pin-left fade' />
         <div className='bat-container pin-bottom'>
@@ -260,13 +216,11 @@ class HomeView extends React.Component {
 
 export default HomeView
 
-function makeid()
-{
-  var text = "";
-  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-  for( var i=0; i < 5; i++ )
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-  return text;
+function makeid () {
+  var text = ''
+  var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  for (var i = 0; i < 5; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length))
+  }
+  return text
 }
