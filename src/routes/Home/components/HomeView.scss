@@ -1,17 +1,11 @@
-::-moz-selection { background-color: transparent; }
-::selection { background-color: transparent; }
-
-body * {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+.reducerView {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 150px;
+  background-color: rgba(0, 0, 0, 0.10);
 }
 
-.map {
-  height: 180%;
-}
 .button-up {
   bottom: 40px;
   left: 40px;
@@ -30,7 +24,7 @@ body * {
   width: 125px;
   height: 170px;
   margin: auto;
-  bottom: 80px;
+  bottom: 40px;
 }
 .bat-wrapper {
   position: absolute;

@@ -1,9 +1,13 @@
 import { combineReducers } from 'redux'
-import locationReducer from './location'
+import locationReducer from 'store/location'
+import player from 'store/modules/player'
+import game from 'store/modules/game'
 
 export const makeRootReducer = (asyncReducers) => {
   return combineReducers({
     location: locationReducer,
+    player,
+    game,
     ...asyncReducers
   })
 }

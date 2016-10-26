@@ -1,4 +1,6 @@
 module.exports = function connect (client, map, player) {
+  // map.easeTo({zoom:23})
+  console.log('zoom', map.getZoom())
   client.record.getRecord(`player/${player}`).whenReady(record => {
     record.set({
       name: player,
@@ -6,7 +8,7 @@ module.exports = function connect (client, map, player) {
       bearing: -9.47
     })
 
-    client.event.subscribe(`status/${player}`, () => {});
+    // client.event.subscribe(`status/${player}`, () => {})
     // Interact with the record here
     var marker
     var delta = 100
@@ -74,30 +76,30 @@ module.exports = function connect (client, map, player) {
       compass.style.transform = rotate
     })
 
-    var buttonLeft = ['left', document.querySelector('.js-left')]
-    var buttonRight = ['right', document.querySelector('.js-right')]
-    var buttonTop = ['up', document.querySelector('.js-up')]
-    var buttonBottom = ['down', document.querySelector('.js-down')]
+    // var buttonLeft = ['left', document.querySelector('.js-left')]
+    // var buttonRight = ['right', document.querySelector('.js-right')]
+    // var buttonTop = ['up', document.querySelector('.js-up')]
+    // var buttonBottom = ['down', document.querySelector('.js-down')]
 
-    var buttons = [buttonLeft, buttonRight, buttonTop, buttonBottom]
-    var persist
+    // var buttons = [buttonLeft, buttonRight, buttonTop, buttonBottom]
+    // var persist
 
-    function buttonStart (b) {
-      persist = setInterval(function () {
-        goDirection(b[0])
-      }, 20)
-    }
+    // function buttonStart (b) {
+    //   persist = setInterval(function () {
+    //     goDirection(b[0])
+    //   }, 20)
+    // }
 
-    function buttonEnd () {
-      clearInterval(persist)
-    }
+    // function buttonEnd () {
+    //   clearInterval(persist)
+    // }
 
-    buttons.forEach(function (b) {
-      b[1].addEventListener('mousedown', buttonStart.bind(this, b))
-      b[1].addEventListener('touchstart', buttonStart.bind(this, b))
-      b[1].addEventListener('mouseup', buttonEnd.bind(this, b))
-      b[1].addEventListener('touchend', buttonEnd.bind(this, b))
-    })
+    // buttons.forEach(function (b) {
+    //   //b[1].addEventListener('mousedown', buttonStart.bind(this, b))
+    //   b[1].addEventListener('touchstart', buttonStart.bind(this, b))
+    //   //b[1].addEventListener('mouseup', buttonEnd.bind(this, b))
+    //   b[1].addEventListener('touchend', buttonEnd.bind(this, b))
+    // })
 
     function createMarker (e) {
       var markerEl = document.createElement('div')
@@ -120,7 +122,7 @@ module.exports = function connect (client, map, player) {
       )
     }
 
-    map.on('click', createMarker)
-    map.on('touchstart', createMarker)
+    // map.on('click', createMarker)
+    // map.on('touchstart', createMarker)
   })
 }
