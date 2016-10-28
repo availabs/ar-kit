@@ -113,9 +113,10 @@ class Settings extends React.Component {
             
           </div>
         </div>
-        <div className='optionsButton' onClick={this.toggleView}>
+        <div className='optionsButton btn btn-floating btn-action share-toggle btn-ptc' onClick={this.toggleView}>
           
         </div>
+        
       </div>
     )
   }

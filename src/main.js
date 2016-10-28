@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import createStore from './store/createStore'
 import { Provider } from 'react-redux'
 import { browserHistory, Router } from 'react-router'
+import { setLocation } from 'store/modules/geolocation'
 
 // ========================================================
 // Store Instantiation
