@@ -26,7 +26,7 @@ class WorldMap extends React.Component {
       }
 
     )
-    var center = this.getGeoArray(this.props.geo) || [0, 0]
+    var center = this.getGeoArray(this.props.geo) || [-73.8248, 42.6874]
     mapboxgl.accessToken =
     // 'pk.eyJ1IjoiYW0zMDgxIiwiYSI6IkxzS0FpU0UifQ.rYv6mHCcNd7KKMs7yhY3rw'
     'pk.eyJ1Ijoic2FtYW4iLCJhIjoiS1ptdnd0VSJ9.19qza-F_vXkgpnh80oZJww'
