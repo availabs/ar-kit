@@ -1,7 +1,7 @@
 /* global mapboxgl */
 import React from 'react'
 import { connect } from 'react-redux'
-import { setLocation } from 'store/modules/geolocation'
+import { setLocation, setGeoError } from 'store/modules/geolocation'
 import './WorldMap.scss'
 // import mapboxgl from 'components/utils/mapbox-gl.js';
 // import mapboxgl from 'mapbox-gl/dist/mapbox-gl.js';
@@ -18,9 +18,7 @@ class WorldMap extends React.Component {
     // ========================================================
     navigator.geolocation.watchPosition(
       this.props.setLocation,
-      (error) => {
-        console.log('geolocation error', error)
-      },
+      this.props.setGeoError,
       {
         enableHighAccuracy: true,
         maximumAge        : 3000,
@@ -28,7 +26,7 @@ class WorldMap extends React.Component {
       }
 
     )
-    var center = this.getGeoArray(this.props.geo) || [0,0]
+    var center = this.getGeoArray(this.props.geo) || [0, 0]
     mapboxgl.accessToken =
     // 'pk.eyJ1IjoiYW0zMDgxIiwiYSI6IkxzS0FpU0UifQ.rYv6mHCcNd7KKMs7yhY3rw'
     'pk.eyJ1Ijoic2FtYW4iLCJhIjoiS1ptdnd0VSJ9.19qza-F_vXkgpnh80oZJww'
@@ -37,7 +35,7 @@ class WorldMap extends React.Component {
       style:
       // 'mapbox://styles/am3081/cin7zv0c5006lbckv6v8lvtxk',
       'mapbox://styles/saman/ciql4uao1000xbkm7knq5qf52',
-      center: [0,0],
+      center: center,
       zoom: 19,
       // minZoom: 19,
       // maxZoom: 19,
@@ -93,7 +91,7 @@ class WorldMap extends React.Component {
     })
   }
 
-  getGeoArray(geo) {
+  getGeoArray (geo) {
     console.log('getGeoArray', location)
     if (geo.location && geo.location.coords &&
       geo.location.coords.latitude && geo.location.coords.longitude) {
@@ -101,8 +99,8 @@ class WorldMap extends React.Component {
       return [geo.location.coords.longitude, geo.location.coords.latitude]
     }
     return false
-    
   }
+
   componentWillReceiveProps (nextProps) {
     console.log('map props', nextProps.geo)
     var center = this.getGeoArray(nextProps.geo)
@@ -122,4 +120,4 @@ const mapStateToProps = (state) => ({
   geo: state.geolocation
 })
 
-export default connect(mapStateToProps, { setLocation })(WorldMap)
+export default connect(mapStateToProps, { setLocation, setGeoError })(WorldMap)

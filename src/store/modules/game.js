@@ -32,7 +32,7 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  name: null,
+  name: 'game1',
   status: null
 }
 export default function counterReducer (state = initialState, action) {

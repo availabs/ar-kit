@@ -27,16 +27,15 @@ class Settings extends React.Component {
     })
   }
 
-  handleInput(e) {
-    let newState = {};
-    let attr = e.target.getAttribute('id')    
+  handleInput (e) {
+    let newState = {}
+    let attr = e.target.getAttribute('id')
     newState[attr] = e.target.value
-    // console.log('testing', newState)
     this.setState(newState)
   }
 
   joinGame () {
-    if(this.state.playerName.length < 3){
+    if (this.state.playerName.length < 3) {
       this.setState({
         message: `Invalid Player Name ${this.state.playerName}`
       })
@@ -44,7 +43,7 @@ class Settings extends React.Component {
     }
     this.props.setPlayer(this.state.playerName)
 
-    if(this.state.gameId.length < 3) {
+    if (this.state.gameId.length < 3) {
       this.setState({
         message: `Invalid Game Id ${this.state.gameId}`
       })
@@ -110,13 +109,10 @@ class Settings extends React.Component {
                 </button>
               </div>
             </div>
-            
           </div>
         </div>
         <div className='optionsButton btn btn-floating btn-action share-toggle btn-ptc' onClick={this.toggleView}>
-          
         </div>
-        
       </div>
     )
   }

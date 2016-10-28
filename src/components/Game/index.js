@@ -1,5 +1,5 @@
 import React from 'react'
-// import { connect } from 'react-redux'
+import { connect } from 'react-redux'
 // import { increment, doubleAsync } from 'store/modules/player'
 import controls from 'components/Controls'
 // import './GameContainer.scss'
@@ -9,7 +9,7 @@ const deepstream = require('deepstream.io-client-js')
 const playerColors = ['#3D9101', '#F0F0E1', '#E89D0C', '#B51C04', '#451005']
 
 // global variables
-var client = deepstream('localhost:6020').login()
+var client = deepstream('lor.availabs.org:6020').login()
 
 class GameContainer extends React.Component {
   constructor (props) {
@@ -18,7 +18,7 @@ class GameContainer extends React.Component {
       players: []
     }
      this.subscribeToGame = this.subscribeToGame.bind(this)
-    //this.onMapLoad = this.onMapLoad.bind(this)
+     // this.onMapLoad = this.onMapLoad.bind(this)
   }
 
   componentDidMount () {
@@ -135,8 +135,17 @@ class GameContainer extends React.Component {
       </div>
     )
   }
+  getGeoArray (geo) {
+    if (geo.location && geo.location.coords &&
+      geo.location.coords.latitude && geo.location.coords.longitude) {
+      console.log('geo success', [geo.location.coords.longitude, geo.location.coords.latitude])
+      return [+geo.location.coords.longitude.toFixed(4), +geo.location.coords.latitude.toFixed(4)]
+    }
+    return false
+  }
 
   render () {
+    console.log(this.props.geo)
     return (
       <div>
         <div className='mb-attribution-container pad1x pad0y pin-bottomleft space-bottom1 space-left1 fill-darken1'>
@@ -153,6 +162,9 @@ class GameContainer extends React.Component {
               }
             </tbody>
           </table>
+          Status: {this.props.geo.status.message} <br />
+          Coords: {this.getGeoArray (this.props.geo) ? JSON.stringify(this.getGeoArray (this.props.geo)) : '...'}
+
         </div>
         {this.renderPlayer()}
         <div className='compass dot fill-white pad1 pin-topright space-right1'>
@@ -163,4 +175,8 @@ class GameContainer extends React.Component {
   }
 }
 
-export default GameContainer
+const mapStateToProps = (state) => ({
+  geo: state.geolocation
+})
+
+export default connect(mapStateToProps, {})(GameContainer)
