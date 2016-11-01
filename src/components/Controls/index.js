@@ -102,6 +102,7 @@ module.exports = function connect (client, map, player) {
     // })
 
     function createMarker (e) {
+      console.log('ltlng', e.lngLat)
       var markerEl = document.createElement('div')
       var dot = document.createElement('div')
       dot.className = 'waypoint-dot'

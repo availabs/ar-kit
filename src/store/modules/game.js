@@ -2,6 +2,7 @@
 // Constants
 // ------------------------------------
 export const SET_GAME = 'SET_GAME'
+export const LOAD_LEVEL = 'LOAD_LEVEL'
 
 // ------------------------------------
 // Actions
@@ -13,8 +14,28 @@ export function setGameId (value) {
   }
 }
 
+export function receiveLevel (value) {
+  return {
+    type    : LOAD_LEVEL,
+    payload : value
+  }
+}
+
+export const loadLevel = (levelName) => {
+  return (dispatch) => {
+    console.log(`/levels/${levelName}.json`)
+    return fetch(`/levels/${levelName}.json`)
+      .then(response => response.json())
+      .then(json => {
+        console.log('load level', json)
+        return dispatch(receiveLevel(json))
+      })
+  }
+}
+
 export const actions = {
-  setGameId
+  setGameId,
+  loadLevel
 }
 
 // ------------------------------------
@@ -25,6 +46,11 @@ const ACTION_HANDLERS = {
     var newState = Object.assign({}, state)
     newState.name = action.payload
     return newState
+  },
+  [LOAD_LEVEL] : (state, action) => {
+    var newState = Object.assign({}, state)
+    newState.level = action.payload
+    return newState
   }
 }
 
@@ -33,9 +59,11 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 const initialState = {
   name: 'game1',
-  status: null
+  status: null,
+  level: null
 }
-export default function counterReducer (state = initialState, action) {
+export default function gameReducer (state = initialState, action) {
+  console.log('action', action)
   const handler = ACTION_HANDLERS[action.type]
   return handler ? handler(state, action) : state
 }

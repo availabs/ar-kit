@@ -1,0 +1,31 @@
+
+.flag-dot {
+  animation: ease-in-out flag 1s 0s infinite alternate both;
+  background: red;
+  box-shadow: 0 0 0 5px rgba(255,0,0,.1);
+  width: 30px;
+  // border-radius: 50%;
+  height: 16px;
+}
+
+.flag-shadow {
+  animation: ease-in-out flag-shadow 1s 0s infinite alternate both;
+  display: block;
+  position: absolute;
+  top: 40px;
+  width: 25px;
+  height: 5px;
+  // border-radius: 50%;
+  background-color: #005773;
+  opacity: .4;
+}
+
+@keyframes flag {
+  0%   { box-shadow: 0 0 0 8px rgba(255,0,0,.1); background: red; transform: scale(.9);}
+  100% { box-shadow: 0 0 0 4px rgba(255,0,0,.1); background: rgba(240,100,0,1); transform: scale(1.1);}
+}
+
+@keyframes flag-shadow {
+  0%   { transform: scale(.9);}
+  100% { transform: scale(1.1);}
+}

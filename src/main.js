@@ -3,12 +3,15 @@ import ReactDOM from 'react-dom'
 import createStore from './store/createStore'
 import { Provider } from 'react-redux'
 import { browserHistory, Router } from 'react-router'
-import { setLocation } from 'store/modules/geolocation'
 
 // ========================================================
 // Store Instantiation
 // ========================================================
-const initialState = window.___INITIAL_STATE__
+const initialState = {}
+// console.log('init', window.___INITIAL_STATE__)
+if (typeof (Storage) !== 'undefined' && localStorage.getItem('player')) {
+  initialState.player = localStorage.getItem('player')
+}
 const store = createStore(initialState)
 
 // ========================================================

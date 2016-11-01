@@ -28,13 +28,14 @@ class WorldMap extends React.Component {
     )
     var center = this.getGeoArray(this.props.geo) || [-73.8248, 42.6874]
     mapboxgl.accessToken =
-    // 'pk.eyJ1IjoiYW0zMDgxIiwiYSI6IkxzS0FpU0UifQ.rYv6mHCcNd7KKMs7yhY3rw'
-    'pk.eyJ1Ijoic2FtYW4iLCJhIjoiS1ptdnd0VSJ9.19qza-F_vXkgpnh80oZJww'
+     'pk.eyJ1IjoiYW0zMDgxIiwiYSI6IkxzS0FpU0UifQ.rYv6mHCcNd7KKMs7yhY3rw'
+    // 'pk.eyJ1Ijoic2FtYW4iLCJhIjoiS1ptdnd0VSJ9.19qza-F_vXkgpnh80oZJww'
     map = new mapboxgl.Map({
       container: 'map',
       style:
+      'mapbox://styles/am3081/ciuwtytee00f02js5j7qwsieg',
       // 'mapbox://styles/am3081/cin7zv0c5006lbckv6v8lvtxk',
-      'mapbox://styles/saman/ciql4uao1000xbkm7knq5qf52',
+      // 'mapbox://styles/saman/ciql4uao1000xbkm7knq5qf52',
       center: center,
       zoom: 19,
       // minZoom: 19,
@@ -92,20 +93,27 @@ class WorldMap extends React.Component {
   }
 
   getGeoArray (geo) {
-    console.log('getGeoArray', location)
     if (geo.location && geo.location.coords &&
       geo.location.coords.latitude && geo.location.coords.longitude) {
-      console.log('geo success', [geo.location.coords.longitude, geo.location.coords.latitude])
       return [geo.location.coords.longitude, geo.location.coords.latitude]
     }
     return false
   }
 
   componentWillReceiveProps (nextProps) {
-    console.log('map props', nextProps.geo)
     var center = this.getGeoArray(nextProps.geo)
     if (center && map) {
       map.setCenter(center)
+      window.setTimeout(function () {
+        map.flyTo({
+          center: { lat:center[1], lng: center[0] },
+          easing: (t) => { return t * (2 - t) }
+        })
+      }, 500)
+
+      // record.set(
+      //   'pos', [e.lngLat.lng, e.lngLat.lat]
+      // )
     }
   }
 
@@ -114,6 +122,13 @@ class WorldMap extends React.Component {
       <div className='pin-top pin-left map' id='map' />
     )
   }
+}
+
+WorldMap.propTypes = {
+  onMapLoad: React.PropTypes.func,
+  setLocation: React.PropTypes.func,
+  setGeoError: React.PropTypes.func,
+  geo: React.PropTypes.object
 }
 
 const mapStateToProps = (state) => ({

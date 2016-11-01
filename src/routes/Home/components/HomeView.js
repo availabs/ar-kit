@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-
+import { loadLevel } from 'store/modules/game'
 // import mapboxgl from 'components/utils/mapbox-gl.js';
 // import mapboxgl from 'mapbox-gl/dist/mapbox-gl.js';
 // import controls from 'components/Controls'
@@ -13,7 +13,8 @@ class HomeView extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      map: null
+      map: null,
+      level: null
     }
     // this.subscribeToGame = this.subscribeToGame.bind(this)
     this.onMapLoad = this.onMapLoad.bind(this)
@@ -29,9 +30,24 @@ class HomeView extends React.Component {
     // this.subscribeToGame(map)
   }
 
+  // componentWillReceiveProps(nextProps) {
+
+  // }
   renderGame () {
-    if (this.state.map && this.props.player && this.props.game.name){
-      return <Game map={this.state.map} currentPlayer={this.props.player} gameId={this.props.game.name}/>
+    console.log('testing levels', this.props.game.level)
+    if (this.state.map && this.props.player && this.props.game.name) {
+      if (!this.props.game.level) {
+        this.props.loadLevel('level_one')
+        return <span />
+      }
+      return (
+        <Game
+          map={this.state.map}
+          currentPlayer={this.props.player}
+          gameId={this.props.game.name}
+          level={this.props.game.level}
+        />
+      )
     }
     return <span />
   }
@@ -52,9 +68,15 @@ class HomeView extends React.Component {
   }
 }
 
+HomeView.propTypes = {
+  player: React.PropTypes.string,
+  game: React.PropTypes.object,
+  loadLevel: React.PropTypes.func
+}
+
 const mapStateToProps = (state) => ({
   player : state.player,
   game: state.game
 })
 
-export default connect(mapStateToProps, {})(HomeView)
+export default connect(mapStateToProps, { loadLevel })(HomeView)

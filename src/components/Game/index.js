@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 // import { increment, doubleAsync } from 'store/modules/player'
 import controls from 'components/Controls'
+import Flag from 'components/Flag'
 // import './GameContainer.scss'
 
 // import deepstream from 'deepstream.io-client-js'
@@ -15,27 +16,52 @@ class GameContainer extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      players: []
+      players: [],
+      level: null,
+      connected: props.levelData
     }
-     this.subscribeToGame = this.subscribeToGame.bind(this)
+    this.subscribeToGame = this.subscribeToGame.bind(this)
+    this.loadLevel = this.loadLevel.bind(this)
      // this.onMapLoad = this.onMapLoad.bind(this)
   }
 
   componentDidMount () {
     this.subscribeToGame()
     controls(client, this.props.map, this.props.currentPlayer)
+    this.loadLevel(this.props)
     client.on('connectionStateChanged', function (connectionState) {
       console.log('connectionState', connectionState)
     })
   }
 
+  loadLevel (props) {
+    // this.props.map.addSource('levelBoundary', {
+    //   'type': 'geojson',
+    //   'data': props.level.boundary
+    // })
+
+    // this.props.map.addLayer({
+    //   'id': 'levelBoundary',
+    //   'type': 'fill',
+    //   'source': 'levelBoundary',
+    //   'layout': {},
+    //   'paint': {
+    //     'fill-color': '#2ce4a1',
+    //     'fill-opacity': 0.1,
+    //     //'line-color': '#5fdb16',
+    //     //'line-width': 3
+    //   }
+    // })
+    this.setState({ level: props.level.name })
+  }
+
   subscribeToGame () {
     var map = this.props.map
-    console.log('subscribeToGame1')
+    // console.log('subscribeToGame1')
     var currentPlayer = this.props.currentPlayer
     client.record.getList(this.props.gameId).whenReady(gameList => {
       var entries = gameList.getEntries()
-      console.log(entries)
+      // console.log(entries)
       if (!entries.includes(this.props.currentPlayer)) {
         // add entry and remove on unload
         // console.log('add entry: ', currentPlayer)
@@ -135,25 +161,24 @@ class GameContainer extends React.Component {
       </div>
     )
   }
+
   getGeoArray (geo) {
     if (geo.location && geo.location.coords &&
       geo.location.coords.latitude && geo.location.coords.longitude) {
-      console.log('geo success', [geo.location.coords.longitude, geo.location.coords.latitude])
       return [+geo.location.coords.longitude.toFixed(4), +geo.location.coords.latitude.toFixed(4)]
     }
     return false
   }
 
   render () {
-    console.log(this.props.geo)
     return (
       <div>
         <div className='mb-attribution-container pad1x pad0y pin-bottomleft space-bottom1 space-left1 fill-darken1'>
           <h4 style={{ fontSize:24 }}>{this.props.currentPlayer}</h4>
         </div>
-        <div className='pad1x pad0y pin-topleft space-top2 space-left1 fill-darken1'>
+        <div className='pad1x pad0y pin-topleft space-top1 space-left1 fill-darken1' style={{ color: '#efefef' }}>
           <h4>Players:</h4>
-          <table className='table'>
+          <table className='table table-condensed' style={{color: '#efefef'}}>
             <tbody>
               {
                 this.state.players.map(d => {
@@ -162,9 +187,27 @@ class GameContainer extends React.Component {
               }
             </tbody>
           </table>
-          Status: {this.props.geo.status.message} <br />
-          Coords: {this.getGeoArray (this.props.geo) ? JSON.stringify(this.getGeoArray (this.props.geo)) : '...'}
 
+          <h4>Flags:</h4>
+          <table className='table table-condensed' style={{color: '#efefef', fontSize: 12}}>
+            <tbody>
+              {
+                this.props.level.flags.map((d,i) => {
+                  return (
+                    <Flag
+                      key={i}
+                      id={i}
+                      lat={d.geometry.coordinates[1]}
+                      lng={d.geometry.coordinates[0]}
+                      map={this.props.map}
+                    />
+                  )
+                })
+              }
+            </tbody>
+          </table>
+          Status: {this.props.geo.status.message} <br />
+          Coords: {this.getGeoArray(this.props.geo) ? JSON.stringify(this.getGeoArray(this.props.geo)) : '...'}
         </div>
         {this.renderPlayer()}
         <div className='compass dot fill-white pad1 pin-topright space-right1'>
@@ -178,5 +221,13 @@ class GameContainer extends React.Component {
 const mapStateToProps = (state) => ({
   geo: state.geolocation
 })
+
+GameContainer.propTypes = {
+  map: React.PropTypes.object,
+  gameId: React.PropTypes.string,
+  currentPlayer: React.PropTypes.string,
+  geo: React.PropTypes.object,
+  levelData: React.PropTypes.object
+}
 
 export default connect(mapStateToProps, {})(GameContainer)

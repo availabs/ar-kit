@@ -22,6 +22,9 @@ export const actions = {
 // ------------------------------------
 const ACTION_HANDLERS = {
   [SET_PLAYER] : (state, action) => {
+    if (typeof (Storage) !== 'undefined') {
+      localStorage.setItem('player', action.payload)
+    }
     return action.payload
   }
 }
