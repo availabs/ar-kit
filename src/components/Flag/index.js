@@ -39,10 +39,15 @@ class Flag extends React.Component {
   componentDidMount () {
     this.createMarker()
     this.state.record.subscribe('score', score => {
-      console.log(`flag ${this.props.id} score`, score)
+      //console.log(`flag ${this.props.id} score`, score)
       this.updateScore(score)
     })
 
+  }
+
+  componentWillUnmount () {
+    clearInterval(the_timer)
+    this.state.record.unsubscribe()
   }
 
   componentWillReceiveProps (nextProps) {

@@ -29,7 +29,7 @@ class GameContainer extends React.Component {
 
   componentDidMount () {
     this.subscribeToGame()
-    controls(this.state.client, this.props.map, this.props.currentPlayer, this.changePosition)
+    controls(this.state.client, this.props.map, this.props.player.name, this.changePosition)
     this.loadLevel(this.props)
     this.state.client.on('connectionStateChanged', function (connectionState) {
       console.log('connectionState', connectionState)
@@ -65,11 +65,11 @@ class GameContainer extends React.Component {
 
   subscribeToGame () {
     var map = this.props.map
-    // console.log('subscribeToGame1')
+    console.log('subscribeToGame1')
     var currentPlayer = this.props.player.name
     this.state.client.record.getList(this.props.gameId).whenReady(gameList => {
       var entries = gameList.getEntries()
-      // console.log(entries)
+      console.log('list entries', entries)
       if (!entries.includes(currentPlayer)) {
         // add entry and remove on unload
         // console.log('add entry: ', currentPlayer)
@@ -82,7 +82,7 @@ class GameContainer extends React.Component {
         }, false)
       }
       gameList.subscribe(entries => {
-        console.log('subscribe', entries)
+        console.log('player list update', entries)
         var playerList = entries.filter(d => d !== currentPlayer)
         var players = this.state.players
         playerList.forEach((player, i) => {
@@ -182,7 +182,7 @@ class GameContainer extends React.Component {
     return (
       <div>
         <div className='mb-attribution-container pad1x pad0y pin-bottomleft space-bottom1 space-left1 fill-darken1'>
-          <h4 style={{ fontSize:24 }}>{this.props.currentPlayer}</h4>
+          <h4 style={{ fontSize:24 }}>{this.props.player.name}</h4>
         </div>
         <div className='pad1x pad0y pin-topleft space-top1 space-left1 fill-darken1' style={{ color: '#efefef' }}>
           <h4>Players:</h4>

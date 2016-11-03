@@ -57,12 +57,12 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  name: 'game1',
+  name: 'game2',
   status: null,
   level: null
 }
 export default function gameReducer (state = initialState, action) {
-  console.log('action', action)
+  // console.log('action', action)
   const handler = ACTION_HANDLERS[action.type]
   return handler ? handler(state, action) : state
 }
