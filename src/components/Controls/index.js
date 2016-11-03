@@ -1,4 +1,4 @@
-module.exports = function connect (client, map, player) {
+module.exports = function connect (client, map, player, update) {
   // map.easeTo({zoom:23})
   console.log('zoom', map.getZoom())
   client.record.getRecord(`player/${player}`).whenReady(record => {
@@ -30,9 +30,12 @@ module.exports = function connect (client, map, player) {
           easing: easeTo
         })
       }
-      // console.log([map.getCenter().lng, map.getCenter().lat])
+      var center = map.getCenter()
+      if (update) {
+        update([center.lng, center.lat])
+      }
       record.set(
-        'pos', [map.getCenter().lng, map.getCenter().lat]
+        'pos', [center.lng, center.lat]
       )
     }
 

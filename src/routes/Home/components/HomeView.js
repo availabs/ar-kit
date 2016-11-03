@@ -22,7 +22,7 @@ class HomeView extends React.Component {
   }
 
   onMapLoad (map) {
-    console.log('map loaded')
+    // console.log('map loaded')
     this.setState({
       map
     })
@@ -34,7 +34,6 @@ class HomeView extends React.Component {
 
   // }
   renderGame () {
-    console.log('testing levels', this.props.game.level)
     if (this.state.map && this.props.player && this.props.game.name) {
       if (!this.props.game.level) {
         this.props.loadLevel('level_one')
@@ -43,7 +42,7 @@ class HomeView extends React.Component {
       return (
         <Game
           map={this.state.map}
-          currentPlayer={this.props.player}
+          player={this.props.player}
           gameId={this.props.game.name}
           level={this.props.game.level}
         />
@@ -57,7 +56,8 @@ class HomeView extends React.Component {
       <div>
         <WorldMap onMapLoad={this.onMapLoad} />
         <div className='reducerView'>
-          {this.props.player} <br />
+          {this.props.player.name} <br />
+          {this.props.player.team} <br />
           {this.props.game.name} <br />
           {this.props.game.status}
         </div>
@@ -69,7 +69,7 @@ class HomeView extends React.Component {
 }
 
 HomeView.propTypes = {
-  player: React.PropTypes.string,
+  player: React.PropTypes.object,
   game: React.PropTypes.object,
   loadLevel: React.PropTypes.func
 }

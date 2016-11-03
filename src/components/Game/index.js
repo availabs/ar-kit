@@ -5,7 +5,7 @@ import controls from 'components/Controls'
 import Flag from 'components/Flag'
 // import './GameContainer.scss'
 
-// import deepstream from 'deepstream.io-client-js'
+// import deepstream from 'deepstream.io-this.state.client-js'
 const deepstream = require('deepstream.io-client-js')
 const playerColors = ['#3D9101', '#F0F0E1', '#E89D0C', '#B51C04', '#451005']
 
@@ -18,18 +18,20 @@ class GameContainer extends React.Component {
     this.state = {
       players: [],
       level: null,
-      connected: props.levelData
+      client: client,
+      position: [props.map.getCenter().lng, props.map.getCenter().lat]
+
     }
     this.subscribeToGame = this.subscribeToGame.bind(this)
     this.loadLevel = this.loadLevel.bind(this)
-     // this.onMapLoad = this.onMapLoad.bind(this)
+    this.changePosition = this.changePosition.bind(this)
   }
 
   componentDidMount () {
     this.subscribeToGame()
-    controls(client, this.props.map, this.props.currentPlayer)
+    controls(this.state.client, this.props.map, this.props.currentPlayer, this.changePosition)
     this.loadLevel(this.props)
-    client.on('connectionStateChanged', function (connectionState) {
+    this.state.client.on('connectionStateChanged', function (connectionState) {
       console.log('connectionState', connectionState)
     })
   }
@@ -55,14 +57,20 @@ class GameContainer extends React.Component {
     this.setState({ level: props.level.name })
   }
 
+  changePosition (pos) {
+    this.setState({
+      position:pos
+    })
+  }
+
   subscribeToGame () {
     var map = this.props.map
     // console.log('subscribeToGame1')
-    var currentPlayer = this.props.currentPlayer
-    client.record.getList(this.props.gameId).whenReady(gameList => {
+    var currentPlayer = this.props.player.name
+    this.state.client.record.getList(this.props.gameId).whenReady(gameList => {
       var entries = gameList.getEntries()
       // console.log(entries)
-      if (!entries.includes(this.props.currentPlayer)) {
+      if (!entries.includes(currentPlayer)) {
         // add entry and remove on unload
         // console.log('add entry: ', currentPlayer)
         gameList.addEntry(currentPlayer)
@@ -99,9 +107,9 @@ class GameContainer extends React.Component {
     // bat.classList.add('js-bat')
     // batWrapper.appendChild(bat)
     // var marker = new mapboxgl.Marker(batWrapper).setLngLat(e.lngLat).addTo(map)
-    var record = client.record.getRecord(`player/${id}`)
+    var record = this.state.client.record.getRecord(`player/${id}`)
     var data = record.get('pos')
-    console.log('adding player', id, data)
+    // console.log('adding player', id, data)
     map.addSource(id, {
       'type': 'geojson',
       'data': {
@@ -178,7 +186,7 @@ class GameContainer extends React.Component {
         </div>
         <div className='pad1x pad0y pin-topleft space-top1 space-left1 fill-darken1' style={{ color: '#efefef' }}>
           <h4>Players:</h4>
-          <table className='table table-condensed' style={{color: '#efefef'}}>
+          <table className='table table-condensed'>
             <tbody>
               {
                 this.state.players.map(d => {
@@ -192,14 +200,17 @@ class GameContainer extends React.Component {
           <table className='table table-condensed' style={{color: '#efefef', fontSize: 12}}>
             <tbody>
               {
-                this.props.level.flags.map((d,i) => {
+                this.props.level.flags.map((d, i) => {
                   return (
                     <Flag
                       key={i}
                       id={i}
-                      lat={d.geometry.coordinates[1]}
-                      lng={d.geometry.coordinates[0]}
+                      pos={d.geometry.coordinates}
                       map={this.props.map}
+                      player_position={this.state.position}
+                      player={this.props.player}
+                      client={this.state.client}
+                      gameId={this.props.gameId}
                     />
                   )
                 })
@@ -225,9 +236,9 @@ const mapStateToProps = (state) => ({
 GameContainer.propTypes = {
   map: React.PropTypes.object,
   gameId: React.PropTypes.string,
-  currentPlayer: React.PropTypes.string,
+  player: React.PropTypes.object,
   geo: React.PropTypes.object,
-  levelData: React.PropTypes.object
+  level: React.PropTypes.object
 }
 
 export default connect(mapStateToProps, {})(GameContainer)

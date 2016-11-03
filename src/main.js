@@ -7,10 +7,16 @@ import { browserHistory, Router } from 'react-router'
 // ========================================================
 // Store Instantiation
 // ========================================================
-const initialState = {}
+const initialState = {
+  player: {
+    name: '',
+    team: 'blue'
+  }
+
+}
 // console.log('init', window.___INITIAL_STATE__)
 if (typeof (Storage) !== 'undefined' && localStorage.getItem('player')) {
-  initialState.player = localStorage.getItem('player')
+  initialState.player.name = localStorage.getItem('player')
 }
 const store = createStore(initialState)
 

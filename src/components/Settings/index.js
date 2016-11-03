@@ -1,15 +1,15 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { setPlayer } from 'store/modules/player'
+import { setPlayer, setPlayerTeam } from 'store/modules/player'
 import { setGameId } from 'store/modules/game'
 import './Settings.scss'
-
 
 class Settings extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       playerName:'',
+      playerTeam:'blue',
       gameId: '',
       message: '',
       open: true
@@ -17,12 +17,15 @@ class Settings extends React.Component {
     this.handleInput = this.handleInput.bind(this)
     this.joinGame = this.joinGame.bind(this)
     this.toggleView = this.toggleView.bind(this)
+    this.setTeam = this.setTeam.bind(this)
+    this.isActiveTeam = this.isActiveTeam.bind(this)
   }
 
   componentDidMount (nextProps) {
-    console.log('settings mount', this.props.player)
+    console.log('settings mount', this.props.player.name)
     this.setState({
-      playerName: this.props.player,
+      playerName: this.props.player.name,
+      playerTeam: this.props.player.team,
       gameId: this.props.game.name
     })
   }
@@ -34,6 +37,12 @@ class Settings extends React.Component {
     this.setState(newState)
   }
 
+  setTeam (team) {
+    this.setState({
+      playerTeam: team
+    })
+  }
+
   joinGame () {
     if (this.state.playerName.length < 3) {
       this.setState({
@@ -42,6 +51,7 @@ class Settings extends React.Component {
       return
     }
     this.props.setPlayer(this.state.playerName)
+    this.props.setPlayerTeam(this.state.playerTeam)
 
     if (this.state.gameId.length < 3) {
       this.setState({
@@ -66,20 +76,29 @@ class Settings extends React.Component {
     })
   }
 
+  isActiveTeam (color) {
+    return color === this.state.playerTeam ? 'active' : null
+  }
+
   render () {
     return (
       <div>
-        <div className='optionsModal' style={{display: this.state.open ? 'block' :  'none'}}>
+        <div className='optionsModal' style={{ display: this.state.open ? 'block' : 'none' }}>
           <div className='container'>
             <div className='row'>
               <div className='col-xs-12'>
-                <h1 style={{ textAlign: 'center', color : '#5d5d5d' }}> Capture the Flag <small style={{fontSize: 10}}>alpha 0.0.0</small></h1>
+                <h1 style={{ textAlign: 'center', color : '#5d5d5d' }}>
+                  Capture the Flag
+                  <small style={{ fontSize: 10 }}>
+                    alpha 0.0.0
+                  </small>
+                </h1>
               </div>
             </div>
             <div className='row'>
               <div className='col-xs-11'>
                 <div className='md-form'>
-                  <input type='text' id='playerName' className='form-control see-through' 
+                  <input type='text' id='playerName' className='form-control see-through'
                     placeholder='Call Sign'
                     value={this.state.playerName}
                     onChange={this.handleInput}
@@ -90,7 +109,7 @@ class Settings extends React.Component {
             <div className='row'>
               <div className='col-xs-11'>
                 <div className='md-form'>
-                  <input type='text' id='gameId' className='form-control see-through' 
+                  <input type='text' id='gameId' className='form-control see-through'
                     placeholder='Game Id'
                     value={this.state.gameId}
                     onChange={this.handleInput}
@@ -98,9 +117,29 @@ class Settings extends React.Component {
                 </div>
               </div>
             </div>
-             <div className='row'>
+            <div className='row'>
+              <div className='col-xs-12' style={{paddingBottom: 10}}>
+                <div className='btn-group btn-block' data-toggle='buttons'>
+                  <label className={`btn col-xs-6 btn-primary btn ${this.isActiveTeam('blue')}`}
+                    onClick={ this.setTeam.bind(null, 'blue') }
+                  >
+                    <input type='radio' name='options' id='option1' checked />
+                    Blue Team
+                  </label>
+                  <label className={`btn col-xs-6 btn-danger btn ${this.isActiveTeam('red')}`}
+                    style={{ style : this.isActiveTeam('red') ?  'border 2px black' : '' }}
+                    onClick={ this.setTeam.bind(null, 'red') }
+                  >
+                    <input type='radio' name='options' id='option3' />
+                    Red Team
+                  </label>
+                  <br />
+                </div>
+              </div>
+            </div>
+            <div className='row'>
               <div className='col-xs-12'>
-                <button 
+                <button
                   type='button'
                   className='btn btn-primary btn-lg btn-block'
                   onClick={this.joinGame}
@@ -109,6 +148,7 @@ class Settings extends React.Component {
                 </button>
               </div>
             </div>
+            
           </div>
         </div>
         <div className='optionsButton btn btn-floating btn-action share-toggle btn-ptc' onClick={this.toggleView}>
@@ -120,7 +160,8 @@ class Settings extends React.Component {
 
 const mapDispatchToProps = {
   setPlayer,
-  setGameId
+  setGameId,
+  setPlayerTeam
 }
 
 const mapStateToProps = (state) => ({

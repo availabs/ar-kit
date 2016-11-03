@@ -27,7 +27,6 @@ export const loadLevel = (levelName) => {
     return fetch(`/levels/${levelName}.json`)
       .then(response => response.json())
       .then(json => {
-        console.log('load level', json)
         return dispatch(receiveLevel(json))
       })
   }

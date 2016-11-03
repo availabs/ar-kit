@@ -8,6 +8,14 @@
   height: 16px;
 }
 
+
+.flag-dot.active {
+  animation: ease-in-out flag-active 1s 0s infinite alternate both;
+  background: green!important;
+  color: yellow;
+  border-radius: 50%;
+}
+
 .flag-shadow {
   animation: ease-in-out flag-shadow 1s 0s infinite alternate both;
   display: block;
@@ -23,6 +31,11 @@
 @keyframes flag {
   0%   { box-shadow: 0 0 0 8px rgba(255,0,0,.1); background: red; transform: scale(.9);}
   100% { box-shadow: 0 0 0 4px rgba(255,0,0,.1); background: rgba(240,100,0,1); transform: scale(1.1);}
+}
+
+@keyframes flag-active {
+  0%   { box-shadow: 0 0 0 8px rgba(0,255,0,.1); background: green; transform: scale(.9);}
+  100% { box-shadow: 0 0 0 4px rgba(0,255,0,.1); background: yellow; transform: scale(1.1);}
 }
 
 @keyframes flag-shadow {

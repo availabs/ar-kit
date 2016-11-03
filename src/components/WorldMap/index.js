@@ -67,6 +67,7 @@ class WorldMap extends React.Component {
       if (this.props.onMapLoad) {
         this.props.onMapLoad(map)
       }
+      map.resize()
       // map.setMinZoom(19)
       // map.setMaxZoom(19)
       map.addLayer({
