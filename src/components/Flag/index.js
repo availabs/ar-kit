@@ -89,30 +89,34 @@ class Flag extends React.Component {
   }
 
   updateScore (flagScore) {
-    var redScore = flagScore.red ? Object.keys(flagScore.red).reduce((p,n) => { return p + flagScore.red[n]}, 0) : 0;
-    var blueScore = flagScore.blue ? Object.keys(flagScore.blue).reduce((p,n) => { return p + flagScore.blue[n]}, 0) : 0;
+    var redScore = flagScore.red ? Object.keys(flagScore.red)
+      .reduce((p, n) => { return p + flagScore.red[n] }, 0) : 0
+    var blueScore = flagScore.blue ? Object.keys(flagScore.blue)
+      .reduce((p, n) => { return p + flagScore.blue[n] }, 0) : 0
     this.setState({
       score: redScore - blueScore
     })
   }
-  
+
   reset () {
     this.state.record.set('score', {})
   }
 
   getDistanceFromLatLonInM(props) {
-    var lat1 = props.player_position[0], lon1 = props.player_position[1]
-    var lat2 = props.pos[0], lon2 = props.pos[1]
-    var dLat = deg2rad(lat2-lat1);  // deg2rad below
-    var dLon = deg2rad(lon2-lon1); 
-    var a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2)
-      ; 
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-    var d = R * c; // Distance in m
-    return d;
+    var lat1 = props.player_position[0]
+    var lon1 = props.player_position[1]
+    var lat2 = props.pos[0]
+    var lon2 = props.pos[1]
+    var dLat = deg2rad(lat2 - lat1)  // deg2rad below
+    var dLon = deg2rad(lon2 - lon1)
+    var a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2)
+
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    var d = R * c // Distance in m
+    return d
   }
 
   render () {

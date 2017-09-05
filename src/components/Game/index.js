@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 // import { increment, doubleAsync } from 'store/modules/player'
 import controls from 'components/Controls'
 import Flag from 'components/Flag'
+import Player from 'components/Player'
 // import './GameContainer.scss'
 
 // import deepstream from 'deepstream.io-this.state.client-js'
@@ -35,6 +36,10 @@ class GameContainer extends React.Component {
       console.log('connectionState', connectionState)
     })
   }
+
+  // componentWillUnmount () {
+    
+  // }
 
   loadLevel (props) {
     // this.props.map.addSource('levelBoundary', {
@@ -88,7 +93,7 @@ class GameContainer extends React.Component {
         playerList.forEach((player, i) => {
           if (!players.includes(player)) {
             console.log('add player', player)
-            this.addPlayer(map, player, playerColors[i % 6])
+            // this.addPlayer(map, player, playerColors[i % 6])
             players.push(player)
           }
         })
@@ -97,63 +102,6 @@ class GameContainer extends React.Component {
         })
       }, true)
     })
-  }
-
-  addPlayer (map, id, color) {
-    // var batWrapper = document.createElement('div')
-    // batWrapper.className = 'bat-wrapper'
-    // var bat = document.createElement('div')
-    // bat.classList.add('bat')
-    // bat.classList.add('js-bat')
-    // batWrapper.appendChild(bat)
-    // var marker = new mapboxgl.Marker(batWrapper).setLngLat(e.lngLat).addTo(map)
-    var record = this.state.client.record.getRecord(`player/${id}`)
-    var data = record.get('pos')
-    // console.log('adding player', id, data)
-    map.addSource(id, {
-      'type': 'geojson',
-      'data': {
-        'type': 'Point',
-        'coordinates': [-73.8135831, 42.6762733] // record.get('pos')
-      }
-    })
-
-    record.subscribe('pos', value => {
-      this.movePlayer(map, value, id)
-    })
-
-    map.addLayer({
-      'id': id + '-glow',
-      'type': 'circle',
-      'source': id,
-      'paint': {
-        'circle-radius': 40,
-        'circle-color': color || '#fff',
-        'circle-opacity': 0.9
-      }
-    })
-
-    map.addLayer({
-      'id': id,
-      'type': 'symbol',
-      'source': id,
-      'layout': {
-        'icon-image': 'airport-15'
-      }
-    })
-  }
-
-  movePlayer (map, location, id) {
-    // Update the data to a new position based on the animation timestamp. The
-    // divisor in the expression `timestamp / 1000` controls the animation speed.
-    // console.log('move', location, id)
-    map.getSource(id).setData({
-      'type': 'Point',
-      'coordinates': location
-    })
-
-    // Request the next frame of the animation.
-    // requestAnimationFrame(animateMarker);
   }
 
   renderPlayer () {
@@ -190,7 +138,7 @@ class GameContainer extends React.Component {
             <tbody>
               {
                 this.state.players.map(d => {
-                  return (<tr key={d}><td>{d}</td></tr>)
+                  return <Player id={d} map={this.props.map} client={this.state.client} list />
                 })
               }
             </tbody>
